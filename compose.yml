@@ -1,0 +1,55 @@
+#Docker Compose Datei für die Einrichtung der PiHole Anwendungen
+
+services:
+    
+nginx:
+    image: nginx:latest
+    container_name: nginx-container
+    ports:
+      - "8080:80"  # Lokaler Port 8080 wird auf den Containerport 80 gemappt
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./html:/usr/share/nginx/html:ro
+    restart: unless-stopped 
+
+pihole1:
+    image: pihole/pihole:latest
+    container_name: pihole1
+    hostname: pihole1
+    environment:
+      TZ: "Europe/Berlin" # Zeitzone anpassen
+      WEBPASSWORD: "passwort1234" # Passwort für Webinterface
+    volumes:
+      - ./pihole1/etc-pihole:/etc/pihole
+      - ./pihole1/etc-dnsmasq.d:/etc/dnsmasq.d
+    ports:
+      - "8081:80" # Webinterface
+      - "5353:53/tcp"
+      - "5353:53/udp"
+    dns:
+      - 127.0.0.1
+      - 8.8.8.8
+      - 8.8.4.4
+    restart: unless-stopped
+
+pihole2:
+    image: pihole/pihole:latest
+    container_name: pihole2
+    hostname: pihole2
+    environment:
+      TZ: "Europe/Berlin" # Zeitzone anpassen
+      WEBPASSWORD: "passwort1234" # Passwort für Webinterface
+    volumes:
+      - ./pihole2/etc-pihole:/etc/pihole
+      - ./pihole2/etc-dnsmasq.d:/etc/dnsmasq.d
+    ports:
+      - "8082:80" # Webinterface
+      - "5354:53/tcp"
+      - "5354:53/udp"
+    dns:
+      - 127.0.0.1
+      - 8.8.8.8
+      - 8.8.4.4
+    restart: unless-stopped
+
+

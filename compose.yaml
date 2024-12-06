@@ -1,8 +1,6 @@
 #Docker Compose Datei für die Einrichtung der PiHole Anwendungen
-
 services:
-    
-nginx:
+  nginx:
     image: nginx:latest
     container_name: nginx-container
     ports:
@@ -10,9 +8,9 @@ nginx:
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - ./html:/usr/share/nginx/html:ro
-    restart: unless-stopped 
+    restart: unless-stopped
 
-pihole1:
+  pihole1:
     image: pihole/pihole:latest
     container_name: pihole1
     hostname: pihole1
@@ -24,15 +22,15 @@ pihole1:
       - ./pihole1/etc-dnsmasq.d:/etc/dnsmasq.d
     ports:
       - "8081:80" # Webinterface
-      - "5353:53/tcp"
-      - "5353:53/udp"
+      - "5353:53/tcp"  # DNS TCP
+      - "5353:53/udp"  # DNS UDP
     dns:
-      - 127.0.0.1
-      - 8.8.8.8
-      - 8.8.4.4
+      - 127.0.0.1  # Lokaler DNS
+      - 8.8.8.8    # Google DNS
+      - 8.8.4.4    # Google DNS
     restart: unless-stopped
 
-pihole2:
+  pihole2:
     image: pihole/pihole:latest
     container_name: pihole2
     hostname: pihole2
@@ -43,13 +41,11 @@ pihole2:
       - ./pihole2/etc-pihole:/etc/pihole
       - ./pihole2/etc-dnsmasq.d:/etc/dnsmasq.d
     ports:
-      - "8082:80" # Webinterface
-      - "5354:53/tcp"
-      - "5354:53/udp"
+      - "8082:81" # Webinterface
+      - "5354:53/tcp"  # DNS TCP
+      - "5354:53/udp"  # DNS UDP
     dns:
-      - 127.0.0.1
-      - 8.8.8.8
-      - 8.8.4.4
+      - 127.0.0.1  # Lokaler DNS
+      - 8.8.8.8    # Google DNS
+      - 8.8.4.4    # Google DNS
     restart: unless-stopped
-
-

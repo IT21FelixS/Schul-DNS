@@ -1,4 +1,7 @@
 #Docker Compose Datei für die Einrichtung der PiHole Anwendungen
+
+version: '3.8'
+
 services:
   nginx:
     image: nginx:latest
@@ -8,44 +11,55 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - ./html:/usr/share/nginx/html:ro
-    restart: unless-stopped
+    restart: always
 
   pihole1:
     image: pihole/pihole:latest
-    container_name: pihole1
+    container_name: pihole-container-1
     hostname: pihole1
     environment:
-      TZ: "Europe/Berlin" # Zeitzone anpassen
-      WEBPASSWORD: "passwort1234" # Passwort für Webinterface
+      TZ: "Europe/Berlin"  # Zeitzone anpassen
+      WEBPASSWORD: "Password123"  # Passwort für die Pi-hole-Weboberfläche
     volumes:
-      - ./pihole1/etc-pihole:/etc/pihole
-      - ./pihole1/etc-dnsmasq.d:/etc/dnsmasq.d
+      - ./pihole/etc-pihole:/etc/pihole
+      - ./pihole/etc-dnsmasq.d:/etc/dnsmasq.d
     ports:
-      - "8081:80" # Webinterface
-      - "5353:53/tcp"  # DNS TCP
-      - "5353:53/udp"  # DNS UDP
+      - "53:53/tcp"  # DNS-Port (TCP)
+      - "53:53/udp"  # DNS-Port (UDP)
+      - "81:80"      # Pi-hole-Weboberfläche (http://localhost:81)
     dns:
-      - 127.0.0.1  # Lokaler DNS
-      - 8.8.8.8    # Google DNS
-      - 8.8.4.4    # Google DNS
+      - 127.0.0.1
+      - 8.8.8.8
+      - 8.8.4.4
     restart: unless-stopped
 
   pihole2:
     image: pihole/pihole:latest
-    container_name: pihole2
+    container_name: pihole-container-2
     hostname: pihole2
     environment:
       TZ: "Europe/Berlin" # Zeitzone anpassen
-      WEBPASSWORD: "passwort1234" # Passwort für Webinterface
+      WEBPASSWORD: "Password123" # Passwort für Webinterface
     volumes:
       - ./pihole2/etc-pihole:/etc/pihole
       - ./pihole2/etc-dnsmasq.d:/etc/dnsmasq.d
     ports:
-      - "8082:81" # Webinterface
-      - "5354:53/tcp"  # DNS TCP
-      - "5354:53/udp"  # DNS UDP
+      - "8082:80" # Webinterface
+      - "5354:53/tcp"
+      - "5354:53/udp"
     dns:
-      - 127.0.0.1  # Lokaler DNS
-      - 8.8.8.8    # Google DNS
-      - 8.8.4.4    # Google DNS
+      - 127.0.0.1
+      - 8.8.8.8
+      - 8.8.4.4
     restart: unless-stopped
+
+    
+#  portainer:
+#    image: portainer/portainer-ce:latest
+#    container_name: portainer-container
+#    ports:
+#      - "9000:9000"  # Webinterface von Portainer (http://localhost:9000)
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock  # Zugriff auf Docker
+#      - ./portainer-data:/data  # Persistente Daten von Portainer
+#    restart: always
